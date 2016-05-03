@@ -17,4 +17,7 @@
         </activity>
     </application>
 
+    <!--NEED THIS FOR PERMISSION TO USE THE MIC-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+
 </manifest>
