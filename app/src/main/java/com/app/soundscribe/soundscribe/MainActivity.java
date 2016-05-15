@@ -23,16 +23,20 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    Button off;
+    Button on;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
 
+        on = (Button) findViewById(R.id.on);
+        off = (Button) findViewById(R.id.off);
 
-        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+        final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+
+        final PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
                 final double pitchInHz = result.getPitch();
@@ -50,14 +54,27 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         };
-        AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
-        dispatcher.addAudioProcessor(p);
+        final AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        //dispatcher.addAudioProcessor(p);
 
-        new Thread(dispatcher,"Audio Dispatcher").start();
+        //new Thread(dispatcher,"Audio Dispatcher").start();
 
+        on.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                dispatcher.addAudioProcessor(p);
+                new Thread(dispatcher,"Audio Dispatcher").start();
+            }
+        });
 
-
+        off.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatcher.removeAudioProcessor(p);
+            }
+        });
     }
+
 
     private String convertNote(double freq)
     {
