@@ -26,6 +26,7 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 public class MainActivity extends AppCompatActivity {
 
     ToggleButton onOff;
+    Hashtable halfstepKey = new Hashtable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         onOff = (ToggleButton) findViewById(R.id.onOff);
+
+        //Assign hash contents
+        halfstepKey.put(0, "A");
+        halfstepKey.put(1, "A#");
+        halfstepKey.put(2, "B");
+        halfstepKey.put(3, "C");
+        halfstepKey.put(4, "C#");
+        halfstepKey.put(5, "D");
+        halfstepKey.put(6, "D#");
+        halfstepKey.put(7, "E");
+        halfstepKey.put(8, "F");
+        halfstepKey.put(9, "F#");
+        halfstepKey.put(10, "G");
+        halfstepKey.put(11, "G#");
 
         final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
 
@@ -75,36 +90,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+    //Converts a frequency to a string representing its note
     private String convertNote(double freq)
     {
-        System.out.println(freq);
+        //System.out.println(freq);
+        //if no sound, return nothing
         if (freq == -1) return "";
-        Hashtable halfstepKey = new Hashtable();
-        halfstepKey.put(0, "A");
-        halfstepKey.put(1, "A#");
-        halfstepKey.put(2, "B");
-        halfstepKey.put(3, "C");
-        halfstepKey.put(4, "C#");
-        halfstepKey.put(5, "D");
-        halfstepKey.put(6, "D#");
-        halfstepKey.put(7, "E");
-        halfstepKey.put(8, "F");
-        halfstepKey.put(9, "F#");
-        halfstepKey.put(10, "G");
-        halfstepKey.put(11, "G#");
 
         double cents = ((Math.log(freq) - Math.log(27.5)) / (Math.log(1.00057779)));
         int totalhalfSteps = Math.abs((int)Math.round(cents / 100));
 
         //Get number of halfsteps from nearest octave
         int halfstep = totalhalfSteps % halfstepKey.size();
+
         //Get octave
         int octave = Math.abs(totalhalfSteps / halfstepKey.size() + 1);
-        System.out.println(octave);
+        //System.out.println(octave);
 
-        //int octave = Math.abs(3 + totalhalfSteps % halfstepKey.size());
-        //System.out.println(halfstep);
         if (halfstep < 0 || halfstep > halfstepKey.size())
         {
             Log.e("Out of bounds", "halfstep out of bounds");
