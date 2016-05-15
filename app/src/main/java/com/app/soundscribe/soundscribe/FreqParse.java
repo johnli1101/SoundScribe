@@ -1,5 +1,6 @@
 package com.app.soundscribe.soundscribe;
 
+import android.app.Fragment;
 import android.util.Log;
 import java.util.Hashtable;
 import java.lang.*;
@@ -7,7 +8,7 @@ import java.lang.*;
 /**
  * Created by Rica on 5/14/2016.
  */
-public class FreqParse
+public class FreqParse extends Fragment
 {
     Hashtable halfstepKey;
 
@@ -37,12 +38,16 @@ public class FreqParse
 
         //Get number of halfsteps from nearest octave
         int halfstep = totalhalfSteps % halfstepKey.size();
-        if (halfstep < 0 || halfstep > halfstepKey.size() + 1)
+        if (halfstep < 0 || halfstep > halfstepKey.size())
         {
             Log.e("Out of bounds", "halfstep out of bounds");
+            return "ERROR";
         }
-
-        return halfstepKey.get(halfstep) + Integer.toString(octave);
+        else
+        {
+            //return halfstepKey.get(halfstep) + Integer.toString(octave);
+            return "works";
+        }
 
     }
 
