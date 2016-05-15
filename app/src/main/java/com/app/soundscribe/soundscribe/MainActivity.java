@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.Hashtable;
 
@@ -23,16 +25,14 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button off;
-    Button on;
+    ToggleButton onOff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        on = (Button) findViewById(R.id.on);
-        off = (Button) findViewById(R.id.off);
+        onOff = (ToggleButton) findViewById(R.id.onOff);
 
         final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
 
@@ -59,18 +59,18 @@ public class MainActivity extends AppCompatActivity {
 
         //new Thread(dispatcher,"Audio Dispatcher").start();
 
-        on.setOnClickListener(new View.OnClickListener(){
+        onOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v){
-                dispatcher.addAudioProcessor(p);
-                new Thread(dispatcher,"Audio Dispatcher").start();
-            }
-        });
-
-        off.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dispatcher.removeAudioProcessor(p);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                {
+                    dispatcher.addAudioProcessor(p);
+                    new Thread(dispatcher, "Audio Dispatcher").start();
+                }
+                else
+                {
+                    dispatcher.removeAudioProcessor(p);
+                }
             }
         });
     }
