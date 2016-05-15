@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -32,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Keep program from falling asleep
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         onOff = (ToggleButton) findViewById(R.id.onOff);
 
@@ -59,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         TextView text = (TextView) findViewById(R.id.pitchAmount);
-                        //Log.e("Out of bounds", "dfgsdf");
-
-                        //Toast.makeText(MainActivity.this, "sdfsdf", Toast.LENGTH_SHORT).show();
                         text.setText(convertNote(pitchInHz));
 
                     }

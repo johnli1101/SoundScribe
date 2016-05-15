@@ -4,13 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context=".MainActivity">
 
+    <!-- Name of Song -->
+    <EditText
+        android:id="@+id/SongName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:maxLength="50"
+        android:cursorVisible="false"
+        android:selectAllOnFocus="true"
+        android:hint="Enter a song title"
+        android:text="Untitled" />
+        />
+
+    <!--Pitch Amount -->
     <TextView
         android:id="@+id/pitchAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="kjhugiu" />
+        android:text="" />
         
     <RelativeLayout 
         android:layout_width="match_parent"
