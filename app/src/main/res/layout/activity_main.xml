@@ -25,12 +25,14 @@
             android:text="OFF"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" />
         <Button
             android:id="@+id/on"
             android:text="ON"
-            android:layout_above="@+id/off"
+            android:layout_="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
     </RelativeLayout>
 </LinearLayout>
