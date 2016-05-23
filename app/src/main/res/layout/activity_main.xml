@@ -8,6 +8,7 @@
     android:focusableInTouchMode="true"
     tools:context=".MainActivity">
 
+
     <!-- Name of Song -->
     <EditText
         android:id="@+id/SongName"
@@ -21,7 +22,6 @@
         android:selectAllOnFocus="true"
         android:hint="Enter a song title"
         android:text="Untitled" />
-        />
 
     <!--Pitch Amount -->
     <TextView
@@ -29,15 +29,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
-        
-    <RelativeLayout 
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
-    
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bars"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="50dp"
+            android:src="@drawable/renderedbg"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/clef"
+            android:layout_alignTop="@+id/bars"
+            android:layout_alignLeft="@+id/bars"
+            android:layout_marginLeft="35dp"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="-10dp"
+            android:src="@drawable/treble" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/quarter"
+            android:layout_alignTop="@+id/clef"
+            android:layout_alignLeft="@+id/clef"
+            android:layout_alignStart="@+id/clef" />
 
         <ToggleButton
             android:id="@+id/onOff"
