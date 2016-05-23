@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -23,17 +24,21 @@ import be.tarsos.dsp.io.android.AudioDispatcherFactory;
 import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
+import be.tarsos.dsp.SilenceDetector;
 
 public class MainActivity extends AppCompatActivity {
 
     ToggleButton onOff;
     Hashtable halfstepKey = new Hashtable();
+    Note[] noteList = new Note[10000];
+    int noteListI = 0;
+    SilenceDetector silenceDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        silenceDetector = new SilenceDetector(SilenceDetector.DEFAULT_SILENCE_THRESHOLD, false);
         //Keep program from falling asleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -54,17 +59,32 @@ public class MainActivity extends AppCompatActivity {
         halfstepKey.put(11, "G#");
 
         final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+        dispatcher.addAudioProcessor(silenceDetector);
 
         final PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
                 final double pitchInHz = result.getPitch();
+                final Boolean isPitched = result.isPitched();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         TextView text = (TextView) findViewById(R.id.pitchAmount);
-                        text.setText(convertNote(pitchInHz));
+                        //if a pitch is detected
+                        if(convertNote(pitchInHz) != "" && isPitched)
+                        {
+                            Note note = new Note(convertNote(pitchInHz), "Q", silenceDetector.currentSPL());
+                            noteList[noteListI] = note;
 
+                            //if this is the first note or the previous note was softer, write note
+                            if (noteListI == 0 || noteList[noteListI - 1].volume < note.volume)
+                            {
+                                text.setText(note.letterNote + " " + note.volume);
+                                Arrays.fill(noteList, null);
+                                noteListI = -1;
+                            }
+                            noteListI++;
+                        }
                     }
 
                 });
@@ -78,13 +98,10 @@ public class MainActivity extends AppCompatActivity {
         onOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
-                {
+                if (isChecked) {
                     dispatcher.addAudioProcessor(p);
                     new Thread(dispatcher, "Audio Dispatcher").start();
-                }
-                else
-                {
+                } else {
                     dispatcher.removeAudioProcessor(p);
                 }
             }
