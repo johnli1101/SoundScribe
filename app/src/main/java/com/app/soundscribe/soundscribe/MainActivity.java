@@ -227,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
                                     (noteList[noteListI - 1].octave + 1 != note.octave && noteList[noteListI - 1].octave - 1 != note.octave && !noteList[noteListI - 1].pitch.equals(note.pitch) ))
                             {
                                 text.setText(note.letterNote + " " + note.volume + " " + note.octave);
+                                System.out.println(note.letterNote);
+                                System.out.println(note.volume);
                                 //++count;
 
                                 //push into calvin's list
@@ -240,7 +242,8 @@ public class MainActivity extends AppCompatActivity {
                                 if (noteListI != 0)
                                 {
                                     Arrays.fill(noteList, null);
-                                    noteListI = -1;
+                                    noteList[0] = note;
+                                    noteListI = 0;
                                 }
                             }
                             noteListI++;
