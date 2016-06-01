@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     int counter = -1;
     boolean validNote = true;
     @Override
-    /*
+ 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         halfstepKey.put(11, "G#");
 
         final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+
         dispatcher.addAudioProcessor(silenceDetector);
 
         final PitchDetectionHandler pdh = new PitchDetectionHandler() {
@@ -113,143 +114,47 @@ public class MainActivity extends AppCompatActivity {
                             //
 
                             //if this is the first note or the previous note was softer, write note
-
                             if (max <= 8) {
-
                                 if (noteListI == 0 ||
-                                    (noteList[noteListI - 1].volume + 30  < note.volume && !noteList[noteListI - 1].letterNote.equals(note.letterNote)) ||
-                                    (noteList[noteListI - 1].octave + 1 != note.octave && noteList[noteListI - 1].octave - 1 != note.octave && !noteList[noteListI - 1].pitch.equals(note.pitch) ))
-                            {
-                                text.setText(note.letterNote + " " + note.volume + " " + note.octave);
+                                        (noteList[noteListI - 1].volume + 5 < note.volume && !noteList[noteListI - 1].letterNote.equals(note.letterNote)) ||
+                                        (noteList[noteListI - 1].octave + 1 != note.octave && noteList[noteListI - 1].octave - 1 != note.octave && !noteList[noteListI - 1].pitch.equals(note.pitch))) {
+                                    text.setText(note.letterNote + " " + note.volume + " " + note.octave);
+                                    //++count;
+
+                                    //push into calvin's list
+                                    //Map.Entry<String,Integer> note1 = new AbstractMap.SimpleEntry<>(t"EA3", 4);
+                                    //parsedNotes.add(note1);
                                     if (note.letterNote.charAt(1) == '#')
                                         note.letterNote = String.valueOf(note.letterNote.charAt(0)) + String.valueOf(note.letterNote.charAt(2));
                                     //check for valid note here
-                                    if (note.letterNote.charAt(1) <= '6' && note.letterNote.charAt(1) >= '2')
-                                    {
+
+
+                                    if (note.octave <= 6 || note.octave >= 2) {
                                         validNote = true;
-                                        if (note.letterNote.charAt(1) == '6')
-                                        {
+                                        if (note.octave == '6') {
                                             if (note.letterNote.charAt(0) != 'A')
                                                 validNote = false;
                                         }
                                     }
                                     else
                                         validNote = false;
+
                                     if (validNote) {
-                                        Log.d("I DIED IN THREAD", "HERE");
-                                        text.setText(note.letterNote + " " + note.volume);
                                         Map.Entry<String, Integer> note1 = new AbstractMap.SimpleEntry<>(note.letterNote, 4);
-                                        Log.d("I DIED IN THREAD", "Before display note");
-                                        //String bla = Integer.toString(note1.getKey());
-                                        Log.d("Passed in there is: ", note1.getKey());
                                         DisplayNote(note1);
-                                        Log.d("I DIED IN THREAD", "After???");
-                                        //push into calvin's list
-                                        //parsedNotes.add(note1);
-                                        Arrays.fill(noteList, null);
-                                        noteListI = -1;
                                         max++;
                                     }
-                                    if (noteListI != 0)
-                                    {
+
+                                    if (noteListI != 0) {
                                         Arrays.fill(noteList, null);
-                                        noteListI = -1;
+                                        noteList[0] = note;
+                                        noteListI = 0;
                                     }
                                 }
+                                noteListI++;
                             }
-                            noteListI++;
                         }
                     }
-                });
-            }
-        };
-        */
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_main);
-        initNotePos();
-
-
-
-        silenceDetector = new SilenceDetector(SilenceDetector.DEFAULT_SILENCE_THRESHOLD, false);
-        //Keep program from falling asleep
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        onOff = (ToggleButton) findViewById(R.id.onOff);
-        composition_button = (Button) findViewById(R.id.composition_mode);
-
-        //Assign hash contents
-        halfstepKey.put(0, "A");
-        halfstepKey.put(1, "A#");
-        halfstepKey.put(2, "B");
-        halfstepKey.put(3, "C");
-        halfstepKey.put(4, "C#");
-        halfstepKey.put(5, "D");
-        halfstepKey.put(6, "D#");
-        halfstepKey.put(7, "E");
-        halfstepKey.put(8, "F");
-        halfstepKey.put(9, "F#");
-        halfstepKey.put(10, "G");
-        halfstepKey.put(11, "G#");
-
-        final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
-
-        dispatcher.addAudioProcessor(silenceDetector);
-
-        final PitchDetectionHandler pdh = new PitchDetectionHandler() {
-            @Override
-            public void handlePitch(PitchDetectionResult result, AudioEvent e) {
-                final double pitchInHz = result.getPitch();
-                final Boolean isPitched = result.isPitched();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView text = (TextView) findViewById(R.id.pitchAmount);
-                        TextView text2 = (TextView) findViewById(R.id.arrayAmount);
-
-                        //Current note volume
-                        double currVolume = silenceDetector.currentSPL();
-
-                        //if a pitch is detected
-                        if(isOn && convertNote(pitchInHz) != "" && isPitched && currVolume > -75)
-                        {
-                            Note note = new Note(convertNote(pitchInHz), "Q", currVolume);
-                            noteList[noteListI] = note;
-
-                            //String yes = Double.toString(currVolume);
-                            //Log.d("vol",yes);
-                            //
-
-                            //if this is the first note or the previous note was softer, write note
-                            if (noteListI == 0 ||
-                                    (noteList[noteListI - 1].volume + 5  < note.volume && !noteList[noteListI - 1].letterNote.equals(note.letterNote)) ||
-                                    (noteList[noteListI - 1].octave + 1 != note.octave && noteList[noteListI - 1].octave - 1 != note.octave && !noteList[noteListI - 1].pitch.equals(note.pitch) ))
-                            {
-                                text.setText(note.letterNote + " " + note.volume + " " + note.octave);
-                                System.out.println(note.letterNote);
-                                System.out.println(note.volume);
-                                //++count;
-
-                                //push into calvin's list
-                                //Map.Entry<String,Integer> note1 = new AbstractMap.SimpleEntry<>(t"EA3", 4);
-                                //parsedNotes.add(note1);
-                                Map.Entry<String, Integer> note1 = new AbstractMap.SimpleEntry<>(note.letterNote, 4);
-                                DisplayNote(note1);
-                                String size = Integer.toString(count);
-                                //Log.d("arraysize", size);
-
-                                if (noteListI != 0)
-                                {
-                                    Arrays.fill(noteList, null);
-                                    noteList[0] = note;
-                                    noteListI = 0;
-                                }
-                            }
-                            noteListI++;
-                        }
-                    }
-
                 });
             }
         };
@@ -353,21 +258,18 @@ public class MainActivity extends AppCompatActivity {
         ImageView img = new ImageView(this);
         if (max >= 8)
         {
-            for (int i = counter; i >= 0; i--) {
+            for (int i = 0; i < 8; i++) {
                 String ctmp = Integer.toString(counter);
                 Log.d("Counter: ", ctmp);
-                ImageView img2 = ((ImageView) findViewById(i));
+                ImageView img2 = ((ImageView) findViewById(counter-i));
                 img2.setImageResource(0);
                 //ImageView myImg = (ImageView)view.findViewById
-                layout.removeView(img.findViewById(i));
+                //layout.removeView(img.findViewById(counter-i));
             }
-            counter = -1;
             currMargin = 100;
             max = 0;
         }
         img.setId(++counter);
-        String ctmp = Integer.toString(counter);
-        Log.d("id: ", ctmp);
         //img.setId(0);
         img.findViewById(R.id.quarter);
 
@@ -375,8 +277,6 @@ public class MainActivity extends AppCompatActivity {
         //this grabs the note at top of queue and checks the list for note position on bar(top margin)
 
         Integer topMargin = notePos.get(x.getKey());
-        String tmp = Integer.toString(topMargin);
-        Log.d("error", tmp);
         //convert pixels to DP to get accurate placement
         float DP1 = this.getResources().getDisplayMetrics().density;
         int topMarginDP = (int)(topMargin*DP1);
@@ -396,28 +296,28 @@ public class MainActivity extends AppCompatActivity {
          */
         if (noteLength == 1) {
             currMargin += 15;
-            if (topMargin <= 92)
+            if (topMargin <= 50)
                 img.setImageResource(R.drawable.sixteenthbottom);
             else
                 img.setImageResource(R.drawable.sixteenth);
         }
         else if (noteLength == 2) {
             currMargin += 28;
-            if (topMargin <= 92)
+            if (topMargin <= 50)
                 img.setImageResource(R.drawable.eighthbottom);
             else
                 img.setImageResource(R.drawable.eighth);
         }
         else if (noteLength == 4) {
             currMargin += 60;
-            if (topMargin <= 92)
+            if (topMargin <= 50)
                 img.setImageResource(R.drawable.quarterbottom);
             else
                 img.setImageResource(R.drawable.quarter);
         }
         else if (noteLength == 8) {
             currMargin += 120;
-            if (topMargin <= 92)
+            if (topMargin <= 50)
                 img.setImageResource(R.drawable.halfbottom);
             else
                 img.setImageResource(R.drawable.half);
