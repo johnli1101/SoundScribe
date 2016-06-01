@@ -36,12 +36,15 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.SilenceDetector;
 
 public class MainActivity extends AppCompatActivity {
+    boolean isOn = true;
+    boolean firstThread = true;
 
     ToggleButton onOff;
     Hashtable halfstepKey = new Hashtable();
     Note[] noteList = new Note[10000];
     int noteListI = 0;
     SilenceDetector silenceDetector;
+    Integer count =0;
 
     //--------------this is my code-----------------
     //This is for the sheet generation.
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     List<Map.Entry<String,Integer>> parsedNotes = new ArrayList<>();
     //left margin of last known note displayed on screen
     int currMargin = 320;
-    HashMap<String, Integer> notePos = new HashMap<String, Integer>();
+    HashMap<String, Integer> notePos = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         halfstepKey.put(11, "G#");
 
         final AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+
         dispatcher.addAudioProcessor(silenceDetector);
 
         final PitchDetectionHandler pdh = new PitchDetectionHandler() {
@@ -103,28 +107,35 @@ public class MainActivity extends AppCompatActivity {
                         double currVolume = silenceDetector.currentSPL();
 
                         //if a pitch is detected
-                        if(convertNote(pitchInHz) != "" && isPitched && currVolume > -80)
+                        if(isOn && convertNote(pitchInHz) != "" && isPitched && currVolume > -75)
                         {
                             Note note = new Note(convertNote(pitchInHz), "Q", currVolume);
                             noteList[noteListI] = note;
 
+                            //String yes = Double.toString(currVolume);
+                            //Log.d("vol",yes);
+                            //
+
                             //if this is the first note or the previous note was softer, write note
-                            if (noteListI == 0 || noteList[noteListI - 1].volume < note.volume)
+                            if (noteListI == 0 ||
+                                    (noteList[noteListI - 1].volume + 5  < note.volume && !noteList[noteListI - 1].letterNote.equals(note.letterNote)) ||
+                                        (noteList[noteListI - 1].octave + 1 != note.octave && noteList[noteListI - 1].octave - 1 != note.octave && !noteList[noteListI - 1].pitch.equals(note.pitch) ))
                             {
-                                text.setText(note.letterNote + " " + note.volume);
+                                text.setText(note.letterNote + " " + note.volume + " " + note.octave);
+                                //++count;
 
                                 //push into calvin's list
-                                Map.Entry<String,Integer> note1 = new AbstractMap.SimpleEntry<>("EA3", 4);
-                                parsedNotes.add(note1);
+                                //Map.Entry<String,Integer> note1 = new AbstractMap.SimpleEntry<>(t"EA3", 4);
+                                //parsedNotes.add(note1);
 
-                                if(parsedNotes.size() == 0)
+                                String size = Integer.toString(count);
+                                //Log.d("arraysize", size);
+
+                                if (noteListI != 0)
                                 {
-
+                                    Arrays.fill(noteList, null);
+                                    noteListI = -1;
                                 }
-                                   // text2.setText(parsedNotes.size());
-
-                                Arrays.fill(noteList, null);
-                                noteListI = -1;
                             }
                             noteListI++;
                         }
@@ -134,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         final AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(p);
         //dispatcher.addAudioProcessor(p);
 
         composition_button.setOnClickListener(new View.OnClickListener() {
@@ -150,12 +162,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    dispatcher.addAudioProcessor(p);
-                    new Thread(dispatcher, "Audio Dispatcher").start();
+                    isOn = true;
 
+                    if (firstThread)
+                    {
+                        new Thread(dispatcher, "Audio Dispatcher").start();
+                        firstThread = false;
+                    }
 
                 } else {
-                    dispatcher.removeAudioProcessor(p);
+                    isOn = false;
                 }
             }
         });

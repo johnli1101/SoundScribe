@@ -9,8 +9,19 @@ public class Note {
         letterNote = n;
         type = t;
         volume = v;
+        octave = Integer.parseInt(n.substring(n.length() - 1));
+        if (n.length() == 3)
+        {
+            pitch = n.substring(0, 1);
+        }
+        else
+        {
+            pitch = n.substring(0);
+        }
     }
     public String letterNote;
     public String type;
     public double volume;
+    public int octave;
+    public String pitch;
 }
