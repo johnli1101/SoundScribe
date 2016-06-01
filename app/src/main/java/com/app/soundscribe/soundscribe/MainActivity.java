@@ -98,10 +98,14 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         TextView text = (TextView) findViewById(R.id.pitchAmount);
                         TextView text2 = (TextView) findViewById(R.id.arrayAmount);
+
+                        //Current note volume
+                        double currVolume = silenceDetector.currentSPL();
+
                         //if a pitch is detected
-                        if(convertNote(pitchInHz) != "" && isPitched)
+                        if(convertNote(pitchInHz) != "" && isPitched && currVolume > -80)
                         {
-                            Note note = new Note(convertNote(pitchInHz), "Q", silenceDetector.currentSPL());
+                            Note note = new Note(convertNote(pitchInHz), "Q", currVolume);
                             noteList[noteListI] = note;
 
                             //if this is the first note or the previous note was softer, write note
